@@ -35,8 +35,8 @@ class VideoCaptureWrapper:
         self.index = 0
         self.cap = cv2.VideoCapture(int(id))
 
-        self.frame_sizes = [(320, 240)]
-        self.frame_rates = [(30)]
+        self.frame_sizes = [(320, 240), (160, 120)]
+        self.frame_rates = [30, 90]
 
         self.controls = []
 
@@ -54,7 +54,9 @@ class VideoCaptureWrapper:
 
     @frame_size.setter
     def frame_size(self, value):
-        print("Setting frame_size not yet supported")
+        self._frame_size = value
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self._frame_size[0])
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.frame_size[1])
 
     @property
     def frame_rate(self):
@@ -62,7 +64,9 @@ class VideoCaptureWrapper:
 
     @frame_rate.setter
     def frame_rate(self, value):
-        print("Setting frame_rate not yet supported")
+        self._frame_rate = value
+        self.cap.set(cv2.CAP_PROP_FPS, self._frame_rate)
+        #print("Setting frame_rate not yet supported")
 
     def isOpened(self):
         return self.cap.isOpened()
@@ -164,10 +168,10 @@ class Frame:
 
     @property
     def gray(self):
-        print("Unsafe gray")
+        #print("Unsafe gray")
         # return gray aka luminace plane of YUV image.
         gray_image = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
-        print(gray_image.shape)
+        #print(gray_image.shape)
         return gray_image
 
     @property 
