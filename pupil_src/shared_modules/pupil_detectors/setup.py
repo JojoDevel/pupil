@@ -165,6 +165,11 @@ extensions = [
     ),
 ]
 
+if "arm" in os.uname().machine:
+    # Raspberry pi arm optimizations
+    for ext in extensions:
+        ext.extra_compile_args += ["-D ENABLE_NEON=ON", "-DENABLE_VFPV3=ON"]
+
 if __name__ == "__main__":
     setup(
         name="pupil_detectors",
