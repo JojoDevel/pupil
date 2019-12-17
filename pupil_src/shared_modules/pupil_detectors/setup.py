@@ -166,9 +166,10 @@ extensions = [
 ]
 
 if "arm" in os.uname().machine:
+    print("Detected arm architecture...Activate optimizations")
     # Raspberry pi arm optimizations
     for ext in extensions:
-        ext.extra_compile_args += ["-D ENABLE_NEON=ON", "-DENABLE_VFPV3=ON"]
+        ext.extra_compile_args += ["-DENABLE_NEON=ON", "-DENABLE_VFPV3=ON"]
 
 if __name__ == "__main__":
     setup(
