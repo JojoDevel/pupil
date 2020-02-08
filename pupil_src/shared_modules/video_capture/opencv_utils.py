@@ -1,5 +1,10 @@
 import cv2
 import numpy as np
+import logging
+
+# logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 class Device_List(list):
 
@@ -7,13 +12,12 @@ class Device_List(list):
         self.update()
 
     def update(self):
-        index = 0
+        '''#index = 0
         arr = []
-        while True:
+        #while True:
+        for index in range(3):
             cap = cv2.VideoCapture(index)
-            if not cap.read()[0]:
-                break
-            else:
+            if cap.read()[0]:
                 id = "video" + str(index)
                 arr.append({'name': id, 'uid': str(index)})
             cap.release()
@@ -23,7 +27,9 @@ class Device_List(list):
 
         self[:] = arr
 
-        print(self[:])
+        print(self[:])'''
+
+        self[:] = [{'name': "video{}".format(index), 'uid': str(index)} for index in range(3)]
 
     def cleanup(self):
         pass
@@ -32,21 +38,27 @@ class VideoCaptureWrapper:
     
     def __init__(self, id):
         self.name = "video" + str(id)
-        self.index = 0
+        self.index = 0      # index is basically the frame id
         self.cap = cv2.VideoCapture(int(id))
 
-        self.frame_sizes = [(320, 240), (160, 120)]
+        logger.info("Create OpenCV Video Capture {}".format(self.name))
+
+        # all available frame settings
+        self.frame_sizes = [(320, 240), (160, 120), (640, 480), (1024, 768), (1920, 1080)]
         self.frame_rates = [30, 90]
 
         self.controls = []
 
+        # get the standard parameters
         self._frame_size = (self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT), self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         self._frame_rate = self.cap.get(cv2.CAP_PROP_FPS)
 
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
+        #self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
+        #self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
 
-        self._frame_size = (320, 240)
+        # set the standard parameters
+        self.frame_size = self.frame_sizes[0]
+        self.frame_rate = self.frame_rates[0]
 
     @property
     def frame_size(self):
