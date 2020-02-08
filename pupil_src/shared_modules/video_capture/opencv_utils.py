@@ -39,6 +39,7 @@ class VideoCaptureWrapper:
     def __init__(self, id):
         self.name = "video" + str(id)
         self.index = 0      # index is basically the frame id
+
         self.cap = cv2.VideoCapture(int(id))
 
         logger.info("Create OpenCV Video Capture {}".format(self.name))
@@ -48,6 +49,7 @@ class VideoCaptureWrapper:
         self.frame_rates = [30, 90]
 
         self.controls = []
+        self._frame_size = (320, 240)
 
         # get the standard parameters
         self._frame_size = (self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT), self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -59,6 +61,14 @@ class VideoCaptureWrapper:
         # set the standard parameters
         self.frame_size = self.frame_sizes[0]
         self.frame_rate = self.frame_rates[0]
+
+        if self.cap:
+
+            self._frame_size = (self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT), self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+            self._frame_rate = self.cap.get(cv2.CAP_PROP_FPS)
+
+            self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
+            self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
 
     @property
     def frame_size(self):
@@ -81,7 +91,7 @@ class VideoCaptureWrapper:
         #print("Setting frame_rate not yet supported")
 
     def isOpened(self):
-        return self.cap.isOpened()
+        return self.cap and self.cap.isOpened()
 
     def get_frame(self):
         frame = Frame()
@@ -152,7 +162,7 @@ class Frame:
 
     @property
     def yuv_buffer(self):
-        print("Unsafe")
+        print("Unsafe bgr -> yuv")
         # TODO make more efficient on multiple calls
         #print(self.frame.shape)
         return cv2.cvtColor(self.frame, cv2.COLOR_BGR2YUV)
@@ -163,7 +173,7 @@ class Frame:
 
     @property
     def yuv420(self):
-        print("Unsafe")
+        print("Unsafe bgr -> yuv420")
         return cv2.cvtColor(self.frame, cv2.COLOR_BGR2YUV_I420)
 
     @property
@@ -188,12 +198,12 @@ class Frame:
 
     @property 
     def bgr(self):
-        print("Unsafe")
+        #print("Unsafe brg -> bgr")
         return self.frame
 
     #for legacy reasons.
     @property
     def img(self):
-        print("Unsafe")
+        print("Unsafe img")
         return self.bgr
 
