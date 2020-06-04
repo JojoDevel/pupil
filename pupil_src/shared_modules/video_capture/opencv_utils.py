@@ -46,7 +46,7 @@ class VideoCaptureWrapper:
 
         # all available frame settings
         self.frame_sizes = [(320, 240), (160, 120), (640, 480), (1024, 768), (1920, 1080)]
-        self.frame_rates = [30, 90]
+        self.frame_rates = [30, 60, 90]
 
         self.controls = []
         self._frame_size = (320, 240)
@@ -156,20 +156,18 @@ class Frame:
 
     @property
     def jpeg_buffer(self):
-        data = cv2.imencode('.jpg', self.frame)[1]
-        data = data.reshape(-1)
-        return data
+        # encode image as jpeg using opencv
+        _, frame = cv2.imencode('.JPEG', self.frame)
+        # flatten
+        frame = frame.reshape(-1)
+        return frame
 
     @property
     def yuv_buffer(self):
         print("Unsafe bgr -> yuv")
         # TODO make more efficient on multiple calls
-        #print(self.frame.shape)
         return cv2.cvtColor(self.frame, cv2.COLOR_BGR2YUV)
-        #if self._yuv_converted is False:
-        #    self.jpeg2yuv()
-        #cdef np.uint8_t[::1] view = <np.uint8_t[:self._yuv_buffer.shape[0]]>&self._yuv_buffer[0]
-        #return view
+
 
     @property
     def yuv420(self):
